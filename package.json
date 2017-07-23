@@ -1,0 +1,64 @@
+{
+  "name": "shaderpen",
+  "description": "Shadertoy like functionality as a portable js library.",
+  "version": "0.0.0",
+  "repository": "https://github.com/halvves/shaderpen.git",
+  "bugs": {
+    "url": "https://github.com/halvves/shaderpen/issues"
+  },
+  "author": "halvves <hi@halvves.com>",
+  "license": "MIT",
+  "keywords": [
+    "WebGL",
+    "shadertoy",
+    "glsl",
+    "3d",
+    "canvas"
+  ],
+  "main": "dist/shaderpen.js",
+  "jsnext:main": "src/shaderpen.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "prebuild": "npm run lint",
+    "build": "babel src --out-dir dist",
+    "lint": "eslint src/shaderpen.js"
+  },
+  "pre-commit": {
+    "run": [
+      "lint"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": "google",
+    "globals": {
+      "document": "true",
+      "window": "true"
+    },
+    "rules": {
+      "max-len": [
+        1,
+        120
+      ],
+      "require-jsdoc": [
+        0
+      ]
+    }
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-preset-es2015": "^6.24.1",
+    "eslint": "^4.3.0",
+    "eslint-config-google": "^0.9.1",
+    "pre-commit": "^1.2.2"
+  }
+}
