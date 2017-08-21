@@ -1,7 +1,7 @@
 {
   "name": "shaderpen",
   "description": "Shadertoy like functionality as a portable js library.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository": "https://github.com/halvves/shaderpen.git",
   "bugs": {
     "url": "https://github.com/halvves/shaderpen/issues"
