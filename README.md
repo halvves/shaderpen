@@ -8,7 +8,7 @@ Shaderpen is a simple library that mimics a lot of the same functionality seen i
 
 ### Script Include
 
-Include the script: `https://cdn.rawgit.com/halvves/shaderpen/v0.0.0/dist/shaderpen.js`
+Include the script: `https://cdn.rawgit.com/halvves/shaderpen/v0.0.1/dist/shaderpen.js`
 
 ```javascript
 new Shaderpen(`
