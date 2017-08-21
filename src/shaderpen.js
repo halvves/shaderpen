@@ -31,7 +31,7 @@ class ShaderPen { // eslint-disable-line no-unused-vars
     };
 
     // create default string values
-    shaderString = `#define ${io[1]} gl_FragColor\n#define ${io[2]} gl_FragCoord.xy\n` + shaderString;
+    shaderString = (io ? `#define ${io[1]} gl_FragColor\n#define ${io[2]} gl_FragCoord.xy\n` : '') + shaderString;
     shaderString = Object.keys(uniforms)
       .map((key) => ({
       name: key,
