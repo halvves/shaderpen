@@ -12,7 +12,7 @@ class ShaderPen { // eslint-disable-line no-unused-vars
         type: 'vec3',
         value: [window.innerWidth, window.innerHeight, 0],
       },
-      iGlobalTime: {
+      iTime: {
         type: 'float',
         value: 0,
       },
@@ -150,7 +150,7 @@ class ShaderPen { // eslint-disable-line no-unused-vars
     let delta = this.lastTime ? ((timestamp - this.lastTime) / 1000) : 0;
     this.lastTime = timestamp;
 
-    this.uniforms.iGlobalTime.value += delta;
+    this.uniforms.iTime.value += delta;
     this.uniforms.iTimeDelta.value = delta;
     this.uniforms.iFrame.value++;
 
