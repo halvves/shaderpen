@@ -21,7 +21,7 @@ var ShaderPen = function () {
         type: 'vec3',
         value: [window.innerWidth, window.innerHeight, 0]
       },
-      iGlobalTime: {
+      iTime: {
         type: 'float',
         value: 0
       },
@@ -40,7 +40,7 @@ var ShaderPen = function () {
     };
 
     // create default string values
-    shaderString = '#define ' + io[1] + ' gl_FragColor\n#define ' + io[2] + ' gl_FragCoord.xy\n' + shaderString;
+    shaderString = (io ? '#define ' + io[1] + ' gl_FragColor\n#define ' + io[2] + ' gl_FragCoord.xy\n' : '') + shaderString;
     shaderString = Object.keys(uniforms).map(function (key) {
       return {
         name: key,
@@ -161,7 +161,7 @@ var ShaderPen = function () {
       var delta = this.lastTime ? (timestamp - this.lastTime) / 1000 : 0;
       this.lastTime = timestamp;
 
-      this.uniforms.iGlobalTime.value += delta;
+      this.uniforms.iTime.value += delta;
       this.uniforms.iTimeDelta.value = delta;
       this.uniforms.iFrame.value++;
 
