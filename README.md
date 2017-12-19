@@ -11,7 +11,7 @@ Shaderpen is a simple library that mimics a lot of the same functionality seen i
 Include the script: `https://cdn.rawgit.com/halvves/shaderpen/v0.0.1/dist/shaderpen.js`
 
 ```javascript
-new Shaderpen(`
+new ShaderPen(`
   WRITE YOUR SHADER HERE
 `);
 ```
