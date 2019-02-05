@@ -3,7 +3,7 @@
   "description": "Shadertoy like functionality as a portable js library.",
   "license": "MIT",
   "author": "halvves <hi@halvves.com>",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/shaderpen.cjs.js",
   "module": "dist/shaderpen.esm.js",
   "browser": "dist/shaderpen.umd.js",
