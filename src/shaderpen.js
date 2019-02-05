@@ -1,4 +1,4 @@
-class ShaderPen {
+export default class ShaderPen {
   constructor(shaderString, noRender) {
     // shadertoy differences
     const ioTest = /\(\s*out\s+vec4\s+(\S+)\s*,\s*in\s+vec2\s+(\S+)\s*\)/;
