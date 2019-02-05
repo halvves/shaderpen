@@ -1,5 +1,8 @@
 # Shaderpen
 
+[![Latest NPM release][npm-badge]][npm-badge-url]
+[![License][license-badge]][license-badge-url]
+
 ## About
 
 Shaderpen is a simple library that mimics a lot of the same functionality seen in Shadertoy. It sets up the WebGL context, adds a canvas to the DOM that auto-resizes to fit the window, sets up a flat vertex shader that covers the entire canvas, and exposes several attributes relating to time, mouse position, etc. This allows you to get started tinkering with WebGL quickly by writing fragment shaders.
@@ -45,3 +48,8 @@ I've tested this library a good bit with various examples from Shadertoy that do
 ## See Also
 
 [Shadertoy](https://www.shadertoy.com/) - The awesome site that inspired this library!
+
+[npm-badge]: https://img.shields.io/npm/v/shaderpen.svg
+[npm-badge-url]: https://www.npmjs.com/package/shaderpen
+[license-badge]: https://img.shields.io/npm/l/shaderpen.svg
+[license-badge-url]: ./LICENSE
