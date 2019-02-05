@@ -6,9 +6,21 @@ Shaderpen is a simple library that mimics a lot of the same functionality seen i
 
 ## Usage
 
+### npm/Import
+
+`npm install shaderpen`
+
+```javascript
+import ShaderPen from 'shaderpen';
+
+new ShaderPen(`
+  WRITE YOUR SHADER HERE
+`);
+```
+
 ### Script Include
 
-Include the script: `https://cdn.rawgit.com/halvves/shaderpen/v0.0.1/dist/shaderpen.js`
+Include the script: `https://unpkg.com/shaderpen`
 
 ```javascript
 new ShaderPen(`
@@ -26,7 +38,6 @@ I've tested this library a good bit with various examples from Shadertoy that do
 
 ## TODO
 
-* Make as module and publish to npm
 * Add iDate from Shadertoy
 * Begin exploring ways of extending
 
