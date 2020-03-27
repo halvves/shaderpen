@@ -1,5 +1,9 @@
 const debounce = require("lodash/debounce");
 
+function remap(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
+
 export default class ShaderPen {
   constructor(shaderString, noRender, options) {
     // shadertoy differences
@@ -154,36 +158,48 @@ export default class ShaderPen {
   }
 
   setupMIDIBindings() {
+    // Check that the user requested it
     if (!this.options || !this.options.midiBindings) return;
+
+    // Check browser support
+    if (!navigator.requestMIDIAccess) {
+      console.log('WebMIDI is not supported in this browser.');
+      return;
+    }
 
     // Reverse mapping for quick lookup
     this.midiList = {};
     const bindings = this.options.midiBindings;
     for (let i = 0; i < bindings.length; i += 1) {
-      if (!Array.isArray(bindings[i]) || bindings[i].length < 2) {
-        console.log('Invalid MIDI command/note: ' + bindings[i]);
+      const b = bindings[i];
+      if (!Array.isArray(b) || b.length < 2) {
+        console.log('Invalid MIDI command/note: ' + b);
         console.log('It should be an array of [command, note].')
         continue;
       }
-      const messageKey = bindings[i][0] + '_' + bindings[i][1];
-      const variableName = 'MIDI' + (i + 1);
-      this.uniforms[variableName] = {
+      // Create a uniform for each requested binding, with variable names
+      // MIDI1, MIDI2, etc. in the order requested by the user.
+      const messageKey = b[0] + '_' + b[1];
+      const bindingOptions = b.length >= 3 && b[2] ? b[2] : {};
+      bindingOptions.variableName = bindingOptions.variableName || 'MIDI' + (i + 1);
+      const defaultValue = typeof bindingOptions.initial == "number" ? bindingOptions.initial : 1;
+      this.uniforms[bindingOptions.variableName] = {
         type: 'float',
-        value: 1,
+        value: defaultValue,
       };
-      this.midiList[messageKey] = variableName;
+      this.midiList[messageKey] = bindingOptions;
     }
 
     const onMIDISuccess = midiAccess => {
-      if (!this.options.midiLogs)
-      console.log("Successful MIDI setup:", midiAccess);
+      if (this.options.midiLogs)
+        console.log("Successful MIDI setup:", midiAccess);
       for (var input of midiAccess.inputs.values()) {
         input.onmidimessage = this.onMIDIMessage;
       }
     };
 
     const onMIDIFailure = () => {
-      console.log('Failed to access MIDI devices. Check browser support.');
+      console.log('Could not setup MIDI devices.');
     };
 
     navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
@@ -199,19 +215,23 @@ export default class ShaderPen {
       return;
     }
     const messageKey = midiMessage.data[0] + '_' + midiMessage.data[1];
-    const variableName = this.midiList[messageKey];
-    if (!variableName) {
+    const bindingOptions = this.midiList[messageKey];
+    if (!bindingOptions) {
       // console.log('Unbound MIDI message: ' + midiMessage.data.toString());
       return;
     }
     
-    let value = ;
+    let value = midiMessage.data[2] / 127;
+    if (bindingOptions.from != null && bindingOptions.to != null) {
+      value = remap(value, 0, 1, bindingOptions.from, bindingOptions.to);
+    }
 
-    this.uniforms[variableName].value = midiMessage.data[2] / 127;
+    this.uniforms[bindingOptions.variableName].value = value;
     this.debouncedLogMIDIState();
   }
 
   logMIDIState() {
+    if (!this.options.midiLogs) return;
     console.log("==== Current MIDI state ====");
     for (let key in this.uniforms) {
       if (key.indexOf("MIDI") !== 0) continue;
