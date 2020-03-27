@@ -76,5 +76,8 @@
     "prettier-package-json": "^2.0.1",
     "rollup": "^1.1.2",
     "rollup-plugin-babel": "^4.3.2"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
   }
 }

@@ -1,5 +1,7 @@
+const debounce = require("lodash/debounce");
+
 export default class ShaderPen {
-  constructor(shaderString, noRender) {
+  constructor(shaderString, noRender, options) {
     // shadertoy differences
     const ioTest = /\(\s*out\s+vec4\s+(\S+)\s*,\s*in\s+vec2\s+(\S+)\s*\)/;
     const io = shaderString.match(ioTest);
@@ -29,6 +31,10 @@ export default class ShaderPen {
         value: [0, 0, 0, 0],
       },
     };
+    
+    this.options = options;
+    this.debouncedLogMIDIState = debounce(this.logMIDIState, 1000);
+    this.setupMIDIBindings();
 
     // create default string values
     shaderString = (io ? `#define ${io[1]} gl_FragColor\n#define ${io[2]} gl_FragCoord.xy\n` : '') + shaderString;
@@ -106,7 +112,10 @@ export default class ShaderPen {
       'mouseMove',
       'mouseUp',
       'render',
-      'resize'
+      'resize', 
+      'setupMIDIBindings',
+      'onMIDIMessage',
+      'logMIDIState'
     );
 
     // add event listeners
@@ -142,6 +151,72 @@ export default class ShaderPen {
     this.mousedown = false;
     this.uniforms.iMouse.value[2] = 0;
     this.uniforms.iMouse.value[3] = 0;
+  }
+
+  setupMIDIBindings() {
+    if (!this.options || !this.options.midiBindings) return;
+
+    // Reverse mapping for quick lookup
+    this.midiList = {};
+    const bindings = this.options.midiBindings;
+    for (let i = 0; i < bindings.length; i += 1) {
+      if (!Array.isArray(bindings[i]) || bindings[i].length < 2) {
+        console.log('Invalid MIDI command/note: ' + bindings[i]);
+        console.log('It should be an array of [command, note].')
+        continue;
+      }
+      const messageKey = bindings[i][0] + '_' + bindings[i][1];
+      const variableName = 'MIDI' + (i + 1);
+      this.uniforms[variableName] = {
+        type: 'float',
+        value: 1,
+      };
+      this.midiList[messageKey] = variableName;
+    }
+
+    const onMIDISuccess = midiAccess => {
+      if (!this.options.midiLogs)
+      console.log("Successful MIDI setup:", midiAccess);
+      for (var input of midiAccess.inputs.values()) {
+        input.onmidimessage = this.onMIDIMessage;
+      }
+    };
+
+    const onMIDIFailure = () => {
+      console.log('Failed to access MIDI devices. Check browser support.');
+    };
+
+    navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+  }
+
+  onMIDIMessage(midiMessage) {
+    if (!this.midiList) {
+      console.log("Missing MIDI list setup.");
+      return;
+    }
+    if (!midiMessage) {
+      console.log("Invalid MIDI message: " + midiMessage);
+      return;
+    }
+    const messageKey = midiMessage.data[0] + '_' + midiMessage.data[1];
+    const variableName = this.midiList[messageKey];
+    if (!variableName) {
+      // console.log('Unbound MIDI message: ' + midiMessage.data.toString());
+      return;
+    }
+    
+    let value = ;
+
+    this.uniforms[variableName].value = midiMessage.data[2] / 127;
+    this.debouncedLogMIDIState();
+  }
+
+  logMIDIState() {
+    console.log("==== Current MIDI state ====");
+    for (let key in this.uniforms) {
+      if (key.indexOf("MIDI") !== 0) continue;
+      console.log(key, this.uniforms[key].value.toFixed(2));
+    }
   }
 
   render(timestamp) {
