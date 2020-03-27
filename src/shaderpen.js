@@ -39,6 +39,7 @@ export default class ShaderPen {
     this.options = options;
     this.debouncedLogMIDIState = debounce(this.logMIDIState, 1000);
     this.setupMIDIBindings();
+    this.setupDOMBindings();
 
     // create default string values
     shaderString = (io ? `#define ${io[1]} gl_FragColor\n#define ${io[2]} gl_FragCoord.xy\n` : '') + shaderString;
@@ -53,13 +54,17 @@ export default class ShaderPen {
     shaderString = 'precision highp float;\n' + shaderString;
 
     // create, position, and add canvas
-    const canvas = this.canvas = document.createElement('canvas');
+    const isCanvasProvided = options && options.canvas;
+    const canvas = this.canvas = isCanvasProvided
+      ? options.canvas
+      : document.createElement('canvas');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     canvas.style.position = 'fixed';
     canvas.style.left = 0;
     canvas.style.top = 0;
-    document.body.append(canvas);
+    if (!isCanvasProvided)
+      document.body.append(canvas);
 
     // get webgl context and set clearColor
     const gl = this.gl = canvas.getContext('webgl');
@@ -119,7 +124,9 @@ export default class ShaderPen {
       'resize', 
       'setupMIDIBindings',
       'onMIDIMessage',
-      'logMIDIState'
+      'logMIDIState',
+      'setupDOMBindings',
+      'updateDOMBindings'
     );
 
     // add event listeners
@@ -155,6 +162,54 @@ export default class ShaderPen {
     this.mousedown = false;
     this.uniforms.iMouse.value[2] = 0;
     this.uniforms.iMouse.value[3] = 0;
+  }
+
+  setupDOMBindings() {
+    // Check that the user requested it
+    if (!this.options || !this.options.domBindings) return;
+    
+    const bindings = this.options.domBindings;
+    this.domList = [];
+    for (let i = 0; i < bindings.length; i += 1) {
+      const b = bindings[i];
+      if (!b || !b.elem) {
+        console.log('Invalid DOM binding: ' + b);
+        continue;
+      }
+      const binding = {
+        elem: b.elem,
+        variablePrefix: `DOM${i + 1}_`
+      };
+      this.domList.push(binding);
+      const coords = this.getDOMNodeCoords(binding);
+      for (let coordKey in coords) {
+        this.uniforms[coordKey] = {
+          type: 'float',
+          value: coords[coordKey],
+        };
+      }
+    }
+  }
+
+  updateDOMBindings() {
+    for (let binding of this.domList) {
+      const coords = this.getDOMNodeCoords(binding);
+      for (let coordKey in coords) {
+        this.uniforms[coordKey].value = coords[coordKey];
+      }
+    }
+  }
+
+  getDOMNodeCoords(binding) {
+    const rect = binding.elem.getBoundingClientRect();
+    const coords = {};
+    coords[binding.variablePrefix + "top"] = window.innerHeight - rect.top;
+    coords[binding.variablePrefix + "bottom"] = window.innerHeight - rect.bottom;
+    coords[binding.variablePrefix + "left"] = rect.left;
+    coords[binding.variablePrefix + "right"] = rect.right;
+    coords[binding.variablePrefix + "height"] = rect.height;
+    coords[binding.variablePrefix + "width"] = rect.width;
+    return coords;
   }
 
   setupMIDIBindings() {
@@ -248,6 +303,8 @@ export default class ShaderPen {
     this.uniforms.iTime.value += delta;
     this.uniforms.iTimeDelta.value = delta;
     this.uniforms.iFrame.value++;
+
+    this.updateDOMBindings();
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
