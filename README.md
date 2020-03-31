@@ -3,6 +3,8 @@
 [![Latest NPM release][npm-badge]][npm-badge-url]
 [![License][license-badge]][license-badge-url]
 
+_Note: While I still try to support this library and am open to extending it, my focus has turned more towards its spiritual successor: [shader-doodle](https://github.com/halvves/shader-doodle). Please consider giving it a try and directing any issues/ideas/pull requests there._
+
 ## About
 
 Shaderpen is a simple library that mimics a lot of the same functionality seen in Shadertoy. It sets up the WebGL context, adds a canvas to the DOM that auto-resizes to fit the window, sets up a flat vertex shader that covers the entire canvas, and exposes several attributes relating to time, mouse position, etc. This allows you to get started tinkering with WebGL quickly by writing fragment shaders.
