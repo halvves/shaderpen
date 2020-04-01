@@ -216,12 +216,8 @@ export default class ShaderPen {
     // Check that the user requested it
     if (!this.options || !this.options.midiBindings) return;
 
-    // Check browser support
-    if (!navigator.requestMIDIAccess) {
-      console.log('WebMIDI is not supported in this browser.');
-      return;
-    }
-
+    // Setup the MIDI variables even if MIDI isn't suppported, so that the shader
+    // does not crash on other browsers and that MIDI variables have a default value.
     // Reverse mapping for quick lookup
     this.midiList = {};
     const bindings = this.options.midiBindings;
@@ -243,6 +239,13 @@ export default class ShaderPen {
         value: defaultValue,
       };
       this.midiList[messageKey] = bindingOptions;
+    }
+
+    
+    // Check browser support
+    if (!navigator.requestMIDIAccess) {
+      console.log('WebMIDI is not supported in this browser.');
+      return;
     }
 
     const onMIDISuccess = midiAccess => {
